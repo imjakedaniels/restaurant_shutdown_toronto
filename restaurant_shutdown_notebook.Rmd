@@ -45,40 +45,40 @@ ford_17 <- rasterGrob(
 
 # Base Plot
 
-```{r, fig.height = 9, fig.width = 16, units = "in"}
+```{r, fig.height = 6, fig.width = 10.6667, units = "in"}
 p <- open_table_canadian %>%
   ggplot(aes(x = date, y = percent_change_yoy, fill = percent_change_yoy)) +
   geom_col(aes(group = date), width = 1) +
-  annotation_custom(ford_12, 
-                    ymin = 20, ymax= 80,
-                    xmin = as.Date("2020-03-01"), 
-                    xmax =  as.Date("2020-03-14")) +
   geom_curve(data = open_table_canadian %>% filter(date == as.Date("2020-03-12")), 
              aes(x = as.Date("2020-03-12"), 
-                 y = 20, 
+                 y = 25, 
                  xend = as.Date("2020-03-12"), 
                  yend = 1), 
              colour = 'white', 
              size = 1, 
              curvature = 0,
              arrow = arrow(length = unit(0.3, "cm"))) +
-  annotation_custom(ford_17, 
-                    ymin = 20, ymax= 80,
-                    xmin = as.Date("2020-03-16"), 
-                    xmax =  as.Date("2020-03-29")) +
+  annotation_custom(ford_12, 
+                    ymin = 10, ymax= 100,
+                    xmin = as.Date("2020-02-29"), 
+                    xmax =  as.Date("2020-03-16")) +
   geom_curve(data = open_table_canadian %>% filter(date == as.Date("2020-03-17")), 
              aes(x = as.Date("2020-03-17"), 
-                 y = 20, 
+                 y = 25, 
                  xend = as.Date("2020-03-17"), 
                  yend = 1), 
              colour = 'white', 
              size = 1, 
              curvature = 0,
              arrow = arrow(length = unit(0.3, "cm"))) +
+  annotation_custom(ford_17, 
+                    ymin = 10, ymax= 100,
+                    xmin = as.Date("2020-03-16"), 
+                    xmax =  as.Date("2020-04-01")) +
   
-  labs(title = "March Toronto Restuarant Shutdown Timeline\nCOVID-19 scare causes Mayor Doug Ford to enact state of emergency in Ontario.",
-       subtitle = "\nShown below is year-over-year seated customers at restaurants on OpenTable network \nacross all channels: online reservations, phone reservations, and walk-ins.",
-       caption = "Viz by @datajake; SOURCE: https://www.opentable.com/state-of-industry") +
+  labs(title = "Toronto Restaurant Shutdown Timeline — March 2020",
+       subtitle = "Shown below is Toronto's year-over-year seated customers at restaurants via OpenTable.",
+       caption = "\nSOURCE: https://www.opentable.com/state-of-industry") +
   scale_fill_gradient2(low = "red", high = "white", midpoint = 25) +
   scale_y_continuous(name = "Year-over-Year Change",
                      breaks = seq(100, -100, by = -50),
@@ -89,8 +89,8 @@ p <- open_table_canadian %>%
                labels = c( "Mar 01", "Mar 31")) +
   expand_limits(y = 100, x = as.Date("2020-03-31")) +
   theme(text = element_text(colour = "white", family = "Montserrat ExtraBold"),
-        plot.title = element_text(size = 20),
-        plot.subtitle = element_text(size = 16, family = "Merriweather Black"),
+        plot.title = element_text(size = 20, family = "Merriweather Black"),
+        plot.subtitle = element_text(size = 12, family = "Merriweather Black"),
         plot.caption = element_text(face = "italic", colour = "grey 50"),
         legend.position = "none",
         panel.grid.minor.x = element_blank(),
@@ -103,7 +103,7 @@ p <- open_table_canadian %>%
         axis.text.x.bottom = element_text(colour = "white"),
         axis.text.y.left = element_text(colour = "white"),
         panel.background = element_rect(fill = "black", colour = "white"),
-        plot.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "#15202b"),
         plot.margin = margin(1, 1, 1, 1, "cm"))
 ```
 
@@ -114,7 +114,7 @@ animated_plot <- p +
   transition_reveal(date) +
   shadow_trail()
 
-options(gganimate.dev_args = list(height = 9, width = 16, units = 'in', type = "cairo", res = 144))
+options(gganimate.dev_args = list(height = 6, width = 10.6667, units = 'in', type = "cairo", res = 144))
 
 animate(plot = animated_plot,
         fps = 10,
