@@ -9,6 +9,7 @@ library(lubridate)
 library(gganimate)
 library(grid)
 library(png)
+library(ggtext)
 library(extrafont)
 ```
 
@@ -45,42 +46,46 @@ ford_17 <- rasterGrob(
 
 # Base Plot
 
-```{r, fig.height = 6, fig.width = 10.6667, units = "in"}
+```{r, fig.height = 675, fig.width = 1200, units = "px"}
 p <- open_table_canadian %>%
   ggplot(aes(x = date, y = percent_change_yoy, fill = percent_change_yoy)) +
-  geom_col(aes(group = date), width = 1) +
-  geom_curve(data = open_table_canadian %>% filter(date == as.Date("2020-03-12")), 
+  geom_col(aes(group = date), colour = case_when(open_table_canadian$percent_change_yoy != -100 ~ "black",
+                                                TRUE ~ "#D62728"), width = 1) +
+  geom_hline(yintercept = 0, colour = "#15202b", size = 0.2) +
+  geom_text(data = open_table_canadian %>% filter(date == max(open_table_canadian$date)),
+            aes(x = as.Date("2020-03-23"),
+                y = -50),
+                label = "State Of Emergency", fontface = "bold") +
+  geom_segment(data = open_table_canadian %>% filter(date == as.Date("2020-03-12")), 
              aes(x = as.Date("2020-03-12"), 
                  y = 25, 
                  xend = as.Date("2020-03-12"), 
                  yend = 1), 
-             colour = 'white', 
+             colour = "#15202b", 
              size = 1, 
-             curvature = 0,
              arrow = arrow(length = unit(0.3, "cm"))) +
   annotation_custom(ford_12, 
                     ymin = 10, ymax= 100,
                     xmin = as.Date("2020-02-29"), 
                     xmax =  as.Date("2020-03-16")) +
-  geom_curve(data = open_table_canadian %>% filter(date == as.Date("2020-03-17")), 
+  geom_segment(data = open_table_canadian %>% filter(date == as.Date("2020-03-17")), 
              aes(x = as.Date("2020-03-17"), 
                  y = 25, 
                  xend = as.Date("2020-03-17"), 
                  yend = 1), 
-             colour = 'white', 
+             colour = "#15202b", 
              size = 1, 
-             curvature = 0,
              arrow = arrow(length = unit(0.3, "cm"))) +
   annotation_custom(ford_17, 
                     ymin = 10, ymax= 100,
                     xmin = as.Date("2020-03-16"), 
                     xmax =  as.Date("2020-04-01")) +
   
-  labs(title = "Toronto Restaurant Shutdown Timeline — March 2020",
-       subtitle = "Shown below is Toronto's year-over-year seated customers at restaurants via OpenTable.",
-       caption = "\nSOURCE: https://www.opentable.com/state-of-industry") +
-  scale_fill_gradient2(low = "red", high = "white", midpoint = 25) +
-  scale_y_continuous(name = "Year-over-Year Change",
+  labs(title = "Toronto Restaurant Shutdown Timeline",
+       subtitle = "Restaurants close as COVID-19 causes Ontario Premier Doug Ford to declare <b style='color:#D62728'>State of Emergency</b>.<br>Shown below is Toronto's year-over-year change in seated customers at restaurants via OpenTable.",
+       caption = "viz @datajake\nsource: https://www.opentable.com/state-of-industry") +
+  scale_fill_gradient2(low = "#D62728", high = "white", midpoint = 25) +
+  scale_y_continuous(name = "YoY Customer Change",
                      breaks = seq(100, -100, by = -50),
                      labels = c("100%", "50%", "0%", 
                                 "-50%", "-100%")) +
@@ -88,23 +93,24 @@ p <- open_table_canadian %>%
                breaks = c(as.Date("2020-03-01"), as.Date("2020-03-31")),
                labels = c( "Mar 01", "Mar 31")) +
   expand_limits(y = 100, x = as.Date("2020-03-31")) +
-  theme(text = element_text(colour = "white", family = "Montserrat ExtraBold"),
-        plot.title = element_text(size = 20, family = "Merriweather Black"),
-        plot.subtitle = element_text(size = 12, family = "Merriweather Black"),
-        plot.caption = element_text(face = "italic", colour = "grey 50"),
+  theme(text = element_text(colour = "#15202b", family = "Montserrat ExtraBold"),
+        plot.title = element_text(size = 22, family = "Merriweather Black", hjust = 0.5),
+        plot.subtitle = element_markdown(size = 10, family = "Merriweather Black", hjust = 0.5),
+        plot.caption = element_text(face = "italic", colour = "grey50", family = "Merriweather Black"),
         legend.position = "none",
         panel.grid.minor.x = element_blank(),
         panel.grid.minor.y = element_blank(),
-        panel.grid.major.y = element_line(colour = "grey20"),
+        panel.grid.major.y = element_line(colour = "grey90"),
         panel.grid.major.x = element_blank(),
-        axis.text.x = element_text(face = "bold"),
-        axis.text.y = element_text(face = "bold"),
+        axis.text.x = element_text(face = "bold", colour = "#15202b"),
+        axis.text.y = element_text(face = "bold", colour = "#15202b"),
         axis.ticks = element_blank(),
-        axis.text.x.bottom = element_text(colour = "white"),
-        axis.text.y.left = element_text(colour = "white"),
-        panel.background = element_rect(fill = "black", colour = "white"),
-        plot.background = element_rect(fill = "#15202b"),
-        plot.margin = margin(1, 1, 1, 1, "cm"))
+        axis.line.y.left = element_line(),
+        panel.background = element_rect(fill = "white", colour = "white"),
+        plot.background = element_rect(fill = "white"),
+        plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
+
+p
 ```
 
 # Animated plot
@@ -114,11 +120,11 @@ animated_plot <- p +
   transition_reveal(date) +
   shadow_trail()
 
-options(gganimate.dev_args = list(height = 6, width = 10.6667, units = 'in', type = "cairo", res = 144))
+options(gganimate.dev_args = list(height = 675, width = 1200, units = 'in', type = "cairo", res = 320))
 
 animate(plot = animated_plot,
         fps = 10,
-        duration = 12,
+        duration = 15,
+        end_pause = 50,
         renderer = gifski_renderer("animations/toronto_restaurant_shutdown.gif"))
 ```
-
