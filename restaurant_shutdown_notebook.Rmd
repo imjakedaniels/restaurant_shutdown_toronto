@@ -46,7 +46,7 @@ ford_17 <- rasterGrob(
 
 # Base Plot
 
-```{r, fig.height = 675, fig.width = 1200, units = "px"}
+```{r, fig.height = 5, fig.width = 9,  dev = "CairoPNG"}
 p <- open_table_canadian %>%
   ggplot(aes(x = date, y = percent_change_yoy, fill = percent_change_yoy)) +
   geom_col(aes(group = date), colour = case_when(open_table_canadian$percent_change_yoy != -100 ~ "black",
@@ -94,7 +94,7 @@ p <- open_table_canadian %>%
                labels = c( "Mar 01", "Mar 31")) +
   expand_limits(y = 100, x = as.Date("2020-03-31")) +
   theme(text = element_text(colour = "#15202b", family = "Montserrat ExtraBold"),
-        plot.title = element_text(size = 22, family = "Merriweather Black", hjust = 0.5),
+        plot.title = element_text(size = 18, family = "Merriweather Black", hjust = 0.5),
         plot.subtitle = element_markdown(size = 10, family = "Merriweather Black", hjust = 0.5),
         plot.caption = element_text(face = "italic", colour = "grey50", family = "Merriweather Black"),
         legend.position = "none",
@@ -120,7 +120,7 @@ animated_plot <- p +
   transition_reveal(date) +
   shadow_trail()
 
-options(gganimate.dev_args = list(height = 675, width = 1200, units = 'in', type = "cairo", res = 320))
+options(gganimate.dev_args = list(height = 5, width = 9, units = 'in', type = "cairo", res = 320))
 
 animate(plot = animated_plot,
         fps = 10,
